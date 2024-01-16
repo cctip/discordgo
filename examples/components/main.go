@@ -40,12 +40,12 @@ var (
 				Type: discordgo.InteractionResponseChannelMessageWithSource,
 				Data: &discordgo.InteractionResponseData{
 					Content: "Huh. I see, maybe some of these resources might help you?",
-					Flags:   1 << 6,
+					Flags:   discordgo.MessageFlagsEphemeral,
 					Components: []discordgo.MessageComponent{
 						discordgo.ActionsRow{
 							Components: []discordgo.MessageComponent{
 								discordgo.Button{
-									Emoji: discordgo.ComponentEmoji{
+									Emoji: &discordgo.ComponentEmoji{
 										Name: "📜",
 									},
 									Label: "Documentation",
@@ -53,7 +53,7 @@ var (
 									URL:   "https://discord.com/developers/docs/interactions/message-components#buttons",
 								},
 								discordgo.Button{
-									Emoji: discordgo.ComponentEmoji{
+									Emoji: &discordgo.ComponentEmoji{
 										Name: "🔧",
 									},
 									Label: "Discord developers",
@@ -61,7 +61,7 @@ var (
 									URL:   "https://discord.gg/discord-developers",
 								},
 								discordgo.Button{
-									Emoji: discordgo.ComponentEmoji{
+									Emoji: &discordgo.ComponentEmoji{
 										Name: "🦫",
 									},
 									Label: "Discord Gophers",
@@ -83,12 +83,12 @@ var (
 				Data: &discordgo.InteractionResponseData{
 					Content: "Great! If you wanna know more or just have questions, feel free to visit Discord Devs and Discord Gophers server. " +
 						"But now, when you know how buttons work, let's move onto select menus (execute `/selects single`)",
-					Flags: 1 << 6,
+					Flags: discordgo.MessageFlagsEphemeral,
 					Components: []discordgo.MessageComponent{
 						discordgo.ActionsRow{
 							Components: []discordgo.MessageComponent{
 								discordgo.Button{
-									Emoji: discordgo.ComponentEmoji{
+									Emoji: &discordgo.ComponentEmoji{
 										Name: "🔧",
 									},
 									Label: "Discord developers",
@@ -96,7 +96,7 @@ var (
 									URL:   "https://discord.gg/discord-developers",
 								},
 								discordgo.Button{
-									Emoji: discordgo.ComponentEmoji{
+									Emoji: &discordgo.ComponentEmoji{
 										Name: "🦫",
 									},
 									Label: "Discord Gophers",
@@ -122,7 +122,7 @@ var (
 					Type: discordgo.InteractionResponseChannelMessageWithSource,
 					Data: &discordgo.InteractionResponseData{
 						Content: "This is the way.",
-						Flags:   1 << 6,
+						Flags:   discordgo.MessageFlagsEphemeral,
 					},
 				}
 			default:
@@ -130,7 +130,7 @@ var (
 					Type: discordgo.InteractionResponseChannelMessageWithSource,
 					Data: &discordgo.InteractionResponseData{
 						Content: "It is not the way to go.",
-						Flags:   1 << 6,
+						Flags:   discordgo.MessageFlagsEphemeral,
 					},
 				}
 			}
@@ -142,7 +142,7 @@ var (
 			_, err = s.FollowupMessageCreate(i.Interaction, true, &discordgo.WebhookParams{
 				Content: "Anyways, now when you know how to use single select menus, let's see how multi select menus work. " +
 					"Try calling `/selects multi` command.",
-				Flags: 1 << 6,
+				Flags: discordgo.MessageFlagsEphemeral,
 			})
 			if err != nil {
 				panic(err)
@@ -157,7 +157,7 @@ var (
 				Type: discordgo.InteractionResponseChannelMessageWithSource,
 				Data: &discordgo.InteractionResponseData{
 					Content: "Here is your stackoverflow URL: " + fmt.Sprintf(stackoverflowFormat, strings.Join(data.Values, "+")),
-					Flags:   1 << 6,
+					Flags:   discordgo.MessageFlagsEphemeral,
 				},
 			})
 			if err != nil {
@@ -165,38 +165,52 @@ var (
 			}
 			time.Sleep(time.Second) // Doing that so user won't see instant response.
 			_, err = s.FollowupMessageCreate(i.Interaction, true, &discordgo.WebhookParams{
-				Content: "Now you know everything about select component. If you want to know more or ask a question - feel free to.",
-				Components: []discordgo.MessageComponent{
-					discordgo.ActionsRow{
-						Components: []discordgo.MessageComponent{
-							discordgo.Button{
-								Emoji: discordgo.ComponentEmoji{
-									Name: "📜",
+				Content: "But wait, there is more! You can also auto populate the select menu. Try executing `/selects auto-populated`.",
+				Flags:   discordgo.MessageFlagsEphemeral,
+			})
+			if err != nil {
+				panic(err)
+			}
+		},
+		"channel_select": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
+			err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+				Type: discordgo.InteractionResponseChannelMessageWithSource,
+				Data: &discordgo.InteractionResponseData{
+					Content: "This is it. You've reached your destination. Your choice was <#" + i.MessageComponentData().Values[0] + ">\n" +
+						"If you want to know more, check out the links below",
+					Components: []discordgo.MessageComponent{
+						discordgo.ActionsRow{
+							Components: []discordgo.MessageComponent{
+								discordgo.Button{
+									Emoji: &discordgo.ComponentEmoji{
+										Name: "📜",
+									},
+									Label: "Documentation",
+									Style: discordgo.LinkButton,
+									URL:   "https://discord.com/developers/docs/interactions/message-components#select-menus",
 								},
-								Label: "Documentation",
-								Style: discordgo.LinkButton,
-								URL:   "https://discord.com/developers/docs/interactions/message-components#select-menus",
-							},
-							discordgo.Button{
-								Emoji: discordgo.ComponentEmoji{
-									Name: "🔧",
+								discordgo.Button{
+									Emoji: &discordgo.ComponentEmoji{
+										Name: "🔧",
+									},
+									Label: "Discord developers",
+									Style: discordgo.LinkButton,
+									URL:   "https://discord.gg/discord-developers",
 								},
-								Label: "Discord developers",
-								Style: discordgo.LinkButton,
-								URL:   "https://discord.gg/discord-developers",
-							},
-							discordgo.Button{
-								Emoji: discordgo.ComponentEmoji{
-									Name: "🦫",
+								discordgo.Button{
+									Emoji: &discordgo.ComponentEmoji{
+										Name: "🦫",
+									},
+									Label: "Discord Gophers",
+									Style: discordgo.LinkButton,
+									URL:   "https://discord.gg/7RuRrVHyXF",
 								},
-								Label: "Discord Gophers",
-								Style: discordgo.LinkButton,
-								URL:   "https://discord.gg/7RuRrVHyXF",
 							},
 						},
 					},
+
+					Flags: discordgo.MessageFlagsEphemeral,
 				},
-				Flags: 1 << 6,
 			})
 			if err != nil {
 				panic(err)
@@ -209,7 +223,7 @@ var (
 				Type: discordgo.InteractionResponseChannelMessageWithSource,
 				Data: &discordgo.InteractionResponseData{
 					Content: "Are you comfortable with buttons and other message components?",
-					Flags:   1 << 6,
+					Flags:   discordgo.MessageFlagsEphemeral,
 					// Buttons and other components are specified in Components field.
 					Components: []discordgo.MessageComponent{
 						// ActionRow is a container of all buttons within the same row.
@@ -237,7 +251,7 @@ var (
 									Disabled: false,
 									// Link buttons don't require CustomID and do not trigger the gateway/HTTP event
 									URL: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-									Emoji: discordgo.ComponentEmoji{
+									Emoji: &discordgo.ComponentEmoji{
 										Name: "🤷",
 									},
 								},
@@ -269,7 +283,7 @@ var (
 					Type: discordgo.InteractionResponseChannelMessageWithSource,
 					Data: &discordgo.InteractionResponseData{
 						Content: "Now let's take a look on selects. This is single item select menu.",
-						Flags:   1 << 6,
+						Flags:   discordgo.MessageFlagsEphemeral,
 						Components: []discordgo.MessageComponent{
 							discordgo.ActionsRow{
 								Components: []discordgo.MessageComponent{
@@ -283,7 +297,7 @@ var (
 												// As with components, this things must have their own unique "id" to identify which is which.
 												// In this case such id is Value field.
 												Value: "go",
-												Emoji: discordgo.ComponentEmoji{
+												Emoji: &discordgo.ComponentEmoji{
 													Name: "🦦",
 												},
 												// You can also make it a default option, but in this case we won't.
@@ -293,7 +307,7 @@ var (
 											{
 												Label: "JS",
 												Value: "js",
-												Emoji: discordgo.ComponentEmoji{
+												Emoji: &discordgo.ComponentEmoji{
 													Name: "🟨",
 												},
 												Description: "JavaScript programming language",
@@ -301,7 +315,7 @@ var (
 											{
 												Label: "Python",
 												Value: "py",
-												Emoji: discordgo.ComponentEmoji{
+												Emoji: &discordgo.ComponentEmoji{
 													Name: "🐍",
 												},
 												Description: "Python programming language",
@@ -318,9 +332,9 @@ var (
 				response = &discordgo.InteractionResponse{
 					Type: discordgo.InteractionResponseChannelMessageWithSource,
 					Data: &discordgo.InteractionResponseData{
-						Content: "The tastiest things are left for the end. Let's see how the multi-item select menu works: " +
+						Content: "Now let's see how the multi-item select menu works: " +
 							"try generating your own stackoverflow search link",
-						Flags: 1 << 6,
+						Flags: discordgo.MessageFlagsEphemeral,
 						Components: []discordgo.MessageComponent{
 							discordgo.ActionsRow{
 								Components: []discordgo.MessageComponent{
@@ -338,7 +352,7 @@ var (
 												Value:       "go",
 												// Default works the same for multi-select menus.
 												Default: false,
-												Emoji: discordgo.ComponentEmoji{
+												Emoji: &discordgo.ComponentEmoji{
 													Name: "🦦",
 												},
 											},
@@ -346,7 +360,7 @@ var (
 												Label:       "JS",
 												Description: "Multiparadigm OOP language",
 												Value:       "javascript",
-												Emoji: discordgo.ComponentEmoji{
+												Emoji: &discordgo.ComponentEmoji{
 													Name: "🟨",
 												},
 											},
@@ -354,7 +368,7 @@ var (
 												Label:       "Python",
 												Description: "OOP prototyping programming language",
 												Value:       "python",
-												Emoji: discordgo.ComponentEmoji{
+												Emoji: &discordgo.ComponentEmoji{
 													Name: "🐍",
 												},
 											},
@@ -362,7 +376,7 @@ var (
 												Label:       "Web",
 												Description: "Web related technologies",
 												Value:       "web",
-												Emoji: discordgo.ComponentEmoji{
+												Emoji: &discordgo.ComponentEmoji{
 													Name: "🌐",
 												},
 											},
@@ -370,7 +384,7 @@ var (
 												Label:       "Desktop",
 												Description: "Desktop applications",
 												Value:       "desktop",
-												Emoji: discordgo.ComponentEmoji{
+												Emoji: &discordgo.ComponentEmoji{
 													Name: "💻",
 												},
 											},
@@ -381,7 +395,27 @@ var (
 						},
 					},
 				}
-
+			case "auto-populated":
+				response = &discordgo.InteractionResponse{
+					Type: discordgo.InteractionResponseChannelMessageWithSource,
+					Data: &discordgo.InteractionResponseData{
+						Content: "The tastiest things are left for the end. Meet auto populated select menus.\n" +
+							"By setting `MenuType` on the select menu you can tell Discord to automatically populate the menu with entities of your choice: roles, members, channels. Try one below.",
+						Flags: discordgo.MessageFlagsEphemeral,
+						Components: []discordgo.MessageComponent{
+							discordgo.ActionsRow{
+								Components: []discordgo.MessageComponent{
+									discordgo.SelectMenu{
+										MenuType:     discordgo.ChannelSelectMenu,
+										CustomID:     "channel_select",
+										Placeholder:  "Pick your favorite channel!",
+										ChannelTypes: []discordgo.ChannelType{discordgo.ChannelTypeGuildText},
+									},
+								},
+							},
+						},
+					},
+				}
 			}
 			err := s.InteractionRespond(i.Interaction, response)
 			if err != nil {
@@ -429,6 +463,11 @@ func main() {
 				Type:        discordgo.ApplicationCommandOptionSubCommand,
 				Name:        "single",
 				Description: "Single-item select menu",
+			},
+			{
+				Type:        discordgo.ApplicationCommandOptionSubCommand,
+				Name:        "auto-populated",
+				Description: "Automatically populated select menu, which lets you pick a member, channel or role",
 			},
 		},
 		Description: "Lo and behold: dropdowns are coming",
