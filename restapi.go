@@ -283,7 +283,8 @@ func (s *Session) RequestWithLockedBucket(method, urlStr, contentType string, b 
 			return
 		}
 		// RetryAfter != 0 的情况就开启重试
-		if cfg.ShouldRetryOnRateLimit && rl.RetryAfter != 0 {
+		// 非bot才考虑重试
+		if cfg.ShouldRetryOnRateLimit && rl.RetryAfter != 0 && strings.Index(s.Token, "Bot ") == 0 {
 			s.log(LogInformational, "Rate Limiting %s, retry in %v", urlStr, rl.RetryAfter)
 			s.handleEvent(rateLimitEventType, &RateLimit{TooManyRequests: &rl, URL: urlStr})
 
