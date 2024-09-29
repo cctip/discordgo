@@ -282,7 +282,7 @@ func (s *Session) RequestWithLockedBucket(method, urlStr, contentType string, b 
 			s.log(LogError, "rate limit unmarshal error, %s", err)
 			return
 		}
-		// RetryAfter = 0 的情况就开启重试
+		// RetryAfter != 0 的情况就开启重试
 		if cfg.ShouldRetryOnRateLimit && rl.RetryAfter != 0 {
 			s.log(LogInformational, "Rate Limiting %s, retry in %v", urlStr, rl.RetryAfter)
 			s.handleEvent(rateLimitEventType, &RateLimit{TooManyRequests: &rl, URL: urlStr})
